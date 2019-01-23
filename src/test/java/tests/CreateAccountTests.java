@@ -5,6 +5,7 @@ import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import util.DataProviders;
 
 public class CreateAccountTests extends TestBase {
     private HomePageHelper homePage;
@@ -23,13 +24,14 @@ public class CreateAccountTests extends TestBase {
         homePage.waitUntilPageIsLoaded();
     }
 
-    @Test
-    public void CreateNewAccountTest(){
+    @Test (dataProviderClass = DataProviders.class,dataProvider = "randomUsers")
+    public void CreateNewAccountTest(String email, String password){
         homePage.pressCreateAccountButton();
         accountCreatePage.waitUntilPageIsLoaded()
-                .enterValueToFieldEmailRandom()
-                .enterValueToFieldPassword("example")
-                .enterValueToFieldPasswordRep("example")
+                //.enterValueToFieldEmailRandom()
+                .enterValueToFieldEmail(email)
+                .enterValueToFieldPassword(password)
+                .enterValueToFieldPasswordRep(password)
                 .pressRegistrationButton();
         profilePage.waitUntilPageIsLoaded();
         Assert.assertEquals(profilePage.getHeader(),"Registration");
@@ -71,6 +73,22 @@ public class CreateAccountTests extends TestBase {
         profilePage.waitUntilPageIsLoaded();
         Assert.assertEquals(profilePage.getHeader(), "Registration");
     }
+    @Test (dataProviderClass = DataProviders.class,dataProvider = "CreateNewAccountWithDataProvider")
+    public void CreateNewAccountWithDataProvider(String email, String password, String passwordRep){
+        homePage.pressCreateAccountButton();
+        accountCreatePage.waitUntilPageIsLoaded()
+                .enterValueToFieldEmail(email)
+                .enterValueToFieldPassword(password)
+                .enterValueToFieldPasswordRep(passwordRep)
+                .pressRegistrationButton();
+        profilePage.waitUntilPageIsLoaded();
+        Assert.assertEquals(profilePage.getHeader(),"Registration");
 
+        profilePage.pressMenuIcon();
+        menuPage.waitUntilPageIsLoaded()
+                .pressLogOutButton();
+        homePage.waitUntilPageIsLoaded();
+        Assert.assertEquals("Go to Event list",homePage.getGoToEventButtonName());
+    }
 
 }
